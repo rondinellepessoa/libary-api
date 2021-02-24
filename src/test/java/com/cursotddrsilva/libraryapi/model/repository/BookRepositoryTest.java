@@ -1,6 +1,7 @@
 package com.cursotddrsilva.libraryapi.model.repository;
 
 import com.cursotddrsilva.libraryapi.model.entity.Book;
+import com.cursotddrsilva.libraryapi.service.BookService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -27,7 +30,7 @@ public class BookRepositoryTest {
     public void returnTrueWhenIsbnExistis(){
         //cenario
         String isbn = "123";
-        Book book = Book.builder().title("As aventuras").author("Fulano").isbn(isbn).build() ;
+        Book book = createNewBook(isbn);
         entityManager.persist(book);
 
         //execucao
@@ -35,6 +38,10 @@ public class BookRepositoryTest {
 
         //verificacao
         Assertions.assertThat(exists).isTrue();
+    }
+
+    private Book createNewBook(String isbn) {
+        return Book.builder().title("As aventuras").author("Fulano").isbn(isbn).build();
     }
 
     @Test
@@ -50,4 +57,49 @@ public class BookRepositoryTest {
         Assertions.assertThat(exists).isFalse();
 
     }
+
+    @Test
+    @DisplayName("Deve obter um livro por id")
+    public void findByIdTest(){
+        //cenario
+        Book book = this.createNewBook("123");
+        this.entityManager.persist(book);
+
+        //execucao
+        Optional<Book> foundBook = this.repository.findById(book.getId());
+
+        //verificacoes
+        Assertions.assertThat(foundBook.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Deve salvar um livro")
+    public void saveBookTest(){
+        //cenario
+        Book book = this.createNewBook("123");
+
+        //execucao
+        Book savedBook = this.repository.save(book);
+
+        //verficacoes
+        Assertions.assertThat(this.repository.findById(savedBook.getId())).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Deve deletar um livro")
+    public void deleteBookTest(){
+        //cenario
+        Book book = this.createNewBook("123");
+        this.entityManager.persist(book);
+
+        //execucao
+        this.repository.delete(book);
+        Book deletedBook = this.entityManager.find(Book.class, book.getId());
+
+        //verificacao
+        Assertions.assertThat(deletedBook).isNull();
+
+
+    }
+
 }
