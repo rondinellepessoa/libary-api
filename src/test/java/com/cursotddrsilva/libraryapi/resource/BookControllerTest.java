@@ -33,20 +33,19 @@ import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-//@RunWith(SpringRunner.class) versao JUNIT < 5
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
 @WebMvcTest(controllers = BookController.class)
 @AutoConfigureMockMvc
 public class BookControllerTest {
 
-    static String BOOK_API = "/api/books";
+    private static String BOOK_API = "/api/books";
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
 
     @MockBean
-    BookService service;
+    private BookService service;
 
     @Test
     @DisplayName("Deve criar um livro com sucesso.")

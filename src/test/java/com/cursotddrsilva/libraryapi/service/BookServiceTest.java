@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class BookServiceTest implements BookService {
+public class BookServiceTest {
 
     BookService service;
 
@@ -42,8 +45,8 @@ public class BookServiceTest implements BookService {
     public void saveBookTest(){
         //cenario
         Book book = createValidBook();
-        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
-        Mockito.when(repository.save(book)).thenReturn(
+        when(repository.existsByIsbn(Mockito.anyString())).thenReturn(false);
+        when(repository.save(book)).thenReturn(
                 createValidBook());
 
         //execucao
@@ -61,13 +64,13 @@ public class BookServiceTest implements BookService {
     public void shouldNotSaveABookWithDuplicatedISBN(){
         //cenario
         Book book = createValidBook();
-        Mockito.when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
+        when(repository.existsByIsbn(Mockito.anyString())).thenReturn(true);
 
         //execucao
         Throwable exception = org.assertj.core.api.Assertions.catchThrowable( () -> service.save(book));
 
         //verificacoes
-        org.assertj.core.api.Assertions.assertThat(exception)
+        assertThat(exception)
                     .isInstanceOf(BusinessException.class)
                     .hasMessage("Isbn já cadastrado");
 
@@ -80,17 +83,17 @@ public class BookServiceTest implements BookService {
         //cenario
         Long id = 1l;
         Book book = createValidBook();
-        Mockito.when(repository.findById(id)).thenReturn(Optional.of(book));
+        when(repository.findById(id)).thenReturn(Optional.of(book));
 
         //execucao
         Optional<Book> foundBook = service.getById(id);
 
         //verificacoes
-        org.assertj.core.api.Assertions.assertThat(foundBook.isPresent()).isTrue();
-        org.assertj.core.api.Assertions.assertThat(foundBook.get().getId()).isEqualTo(id);
-        org.assertj.core.api.Assertions.assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
-        org.assertj.core.api.Assertions.assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
-        org.assertj.core.api.Assertions.assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
+        assertThat(foundBook.isPresent()).isTrue();
+        assertThat(foundBook.get().getId()).isEqualTo(id);
+        assertThat(foundBook.get().getIsbn()).isEqualTo(book.getIsbn());
+        assertThat(foundBook.get().getAuthor()).isEqualTo(book.getAuthor());
+        assertThat(foundBook.get().getTitle()).isEqualTo(book.getTitle());
     }
 
     @Test
@@ -98,13 +101,13 @@ public class BookServiceTest implements BookService {
     public void bookNotFoundByIdTest(){
         //cenario
         Long id = 1l;
-        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findById(id)).thenReturn(Optional.empty());
 
         //execucao
         Optional<Book> foundBook = service.getById(id);
 
         //verificacoes
-        org.assertj.core.api.Assertions.assertThat(foundBook.isPresent()).isFalse();
+        assertThat(foundBook.isPresent()).isFalse();
 
     }
 
@@ -147,16 +150,16 @@ public class BookServiceTest implements BookService {
         Book updateBook = this.createValidBook();
         updateBook.setId(id);
 
-        Mockito.when(this.repository.save(updatingBook)).thenReturn(updateBook);
+        when(this.repository.save(updatingBook)).thenReturn(updateBook);
 
         //execucao
         Book book = this.service.update(updatingBook);
 
         //verificacoes
-        org.assertj.core.api.Assertions.assertThat(book.getId()).isEqualTo(updateBook.getId());
-        org.assertj.core.api.Assertions.assertThat(book.getIsbn()).isEqualTo(updateBook.getIsbn());
-        org.assertj.core.api.Assertions.assertThat(book.getTitle()).isEqualTo(updateBook.getTitle());
-        org.assertj.core.api.Assertions.assertThat(book.getAuthor()).isEqualTo(updateBook.getAuthor());
+        assertThat(book.getId()).isEqualTo(updateBook.getId());
+        assertThat(book.getIsbn()).isEqualTo(updateBook.getIsbn());
+        assertThat(book.getTitle()).isEqualTo(updateBook.getTitle());
+        assertThat(book.getAuthor()).isEqualTo(updateBook.getAuthor());
     }
 
     @Test
@@ -181,52 +184,35 @@ public class BookServiceTest implements BookService {
         PageRequest pageRequest = PageRequest.of(0, 10);
         List<Book> lista = Arrays.asList(book);
         Page<Book> page = new PageImpl<Book>(lista, pageRequest, 1);
-        Mockito.when(this.repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
+        when(this.repository.findAll(Mockito.any(Example.class), Mockito.any(PageRequest.class)))
                 .thenReturn(page);
 
         //execucao
         Page<Book> result = this.service.find(book, pageRequest);
 
         //verificacoes
-        org.assertj.core.api.Assertions.assertThat(result.getTotalElements()).isEqualTo(1);
-        org.assertj.core.api.Assertions.assertThat(result.getContent()).isEqualTo(lista);
-        org.assertj.core.api.Assertions.assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
-        org.assertj.core.api.Assertions.assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(lista);
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
     }
 
-    @Override
-    public Book save(Book any) {
-        return null;
-    }
+    @Test
+    @DisplayName("Deve obter um livro pelo isbn")
+    public void getBookByIsbnTest(){
+        //cenario
+        String isbn = "1230";
+        when(this.repository.findByIsbn(isbn)).thenReturn(Optional.of(Book.builder().id(1l).isbn(isbn).build()));
 
-    @Override
-    public Optional<Book> getById(Long id) {
-        return Optional.empty();
-    }
+        //execucao
+        Optional<Book> book = this.service.getBookByIsbn(isbn);
 
-    @Override
-    public void delete(Book book) {
+        //verificacoes
+        assertThat(book.isPresent()).isTrue();
+        assertThat(book.get().getId()).isEqualTo(1l);
+        assertThat(book.get().getIsbn()).isEqualTo(isbn);
 
-    }
-
-    @Override
-    public Book update(Book book) {
-        return null;
-    }
-
-    @Override
-    public Page find(Book filter, org.springframework.data.domain.Pageable pageRequest) {
-        return null;
-    }
-
-    @Override
-    public Page find(Book filter, Pageable pageRequest) {
-        return null;
-    }
-
-    @Override
-    public Optional<Book> getBookByIsbn(String isbn) {
-        return Optional.empty();
+        verify(this.repository, times(1)).findByIsbn(isbn);
     }
 
     private Book createValidBook() {

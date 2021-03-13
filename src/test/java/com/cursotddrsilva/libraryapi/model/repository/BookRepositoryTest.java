@@ -1,7 +1,6 @@
 package com.cursotddrsilva.libraryapi.model.repository;
 
 import com.cursotddrsilva.libraryapi.model.entity.Book;
-import com.cursotddrsilva.libraryapi.service.BookService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ public class BookRepositoryTest {
         Assertions.assertThat(exists).isTrue();
     }
 
-    private Book createNewBook(String isbn) {
+    public static Book createNewBook(String isbn) {
         return Book.builder().title("As aventuras").author("Fulano").isbn(isbn).build();
     }
 
