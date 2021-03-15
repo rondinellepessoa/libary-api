@@ -8,6 +8,8 @@ import com.cursotddrsilva.libraryapi.model.entity.Book;
 import com.cursotddrsilva.libraryapi.model.entity.Loan;
 import com.cursotddrsilva.libraryapi.service.BookService;
 import com.cursotddrsilva.libraryapi.service.LoanService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("api/loans")
 @RequiredArgsConstructor
+@Api("Loan API")
 public class LoanController {
 
     private final LoanService service;
@@ -33,6 +36,7 @@ public class LoanController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @ApiOperation("Creates a loan")
     public Long create(@RequestBody LoanDto dto){
         Book book = bookService
                 .getBookByIsbn(dto.getIsbn())
@@ -49,6 +53,7 @@ public class LoanController {
     }
 
     @PatchMapping("{id}")
+    @ApiOperation("Find the loan returned.")
     public void returnBook(@PathVariable Long id, @RequestBody ReturnedLoanDTO dto){
         Loan loan = this.service.getById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         loan.setReturned(dto.getReturned());
@@ -56,6 +61,7 @@ public class LoanController {
     }
 
     @GetMapping
+    @ApiOperation("Find a loan")
     public Page<LoanDto> find(LoanFilterDTO dto, Pageable pageable){
         Page<Loan> result = this.service.find(dto, pageable);
         List<LoanDto> loans = result
