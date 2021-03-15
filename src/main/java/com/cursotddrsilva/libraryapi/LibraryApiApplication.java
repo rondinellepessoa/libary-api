@@ -18,7 +18,7 @@ import java.util.List;
 public class LibraryApiApplication {
 
 	/**
-	 * Usado somente para o teste do envio de email
+	 * Usado somente para o teste do envio de emails
 	 */
 	/*@Autowired
 	private EmailService emailService;*/
