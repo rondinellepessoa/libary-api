@@ -34,7 +34,7 @@ public class BookController {
 
     private final BookService service;
     private final ModelMapper modelMapper;
-    //private final LoanService loanService;
+    private final LoanService loanService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -76,7 +76,7 @@ public class BookController {
 
     @PutMapping("{id}")
     @ApiOperation("Updates a book")
-    public BookDTO update(@PathVariable Long id, BookDTO dto){
+    public BookDTO update(@PathVariable Long id,@RequestBody @Valid BookDTO dto){
         return service.getById(id).map( book -> {
 
             book.setAuthor(dto.getAuthor());
@@ -100,7 +100,7 @@ public class BookController {
         return new PageImpl<BookDTO>(list, pageRequest, result.getTotalElements());
     }
 
-    /*@GetMapping("{id}/loans")
+    @GetMapping("{id}/loans")
     public Page<LoanDto> loansByBook( @PathVariable Long id, Pageable pageable){
         Book book = this.service.getById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Page<Loan> result = this.loanService.getLoansByBook(book, pageable);
@@ -113,5 +113,5 @@ public class BookController {
                     return loanDto;
                 }).collect(Collectors.toList());
         return new PageImpl<LoanDto>(list, pageable, result.getTotalElements());
-    }*/
+    }
 }
