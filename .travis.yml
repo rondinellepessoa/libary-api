@@ -3,4 +3,6 @@ jdk:
   - oraclejdk11
 dist:trusty
 before_install:
- - chmod -mvnw
+  - chmod -mvnw
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
